@@ -1,4 +1,4 @@
-name: Build FatturaPA QLPlugi
+name: Build FatturaPA QLPlugin
 
 on:
   push:
@@ -37,15 +37,19 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build
 
-      # 4. Trova e mostra il percorso del .appex
-      - name: Trova .appex
+      # 4. Copia il .appex in una cartella di staging
+      #    Così nello ZIP scaricato troverai direttamente FatturaPA-QLPlugin.appex
+      - name: Prepara artifact
         run: |
-          find build/ -name "*.appex" -print
+          APPEX=$(find build/ -name "*.appex" | head -1)
+          echo "Trovato: $APPEX"
+          mkdir -p staging
+          cp -R "$APPEX" staging/
 
-      # 5. Carica il .appex come artifact scaricabile
+      # 5. Carica la cartella staging: estraendo lo ZIP ottieni subito il .appex
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: FatturaPA-QLPlugin
-          path: build/Build/Products/Release/FatturaPA-QLPlugin.appex
+          path: staging/
           retention-days: 30
