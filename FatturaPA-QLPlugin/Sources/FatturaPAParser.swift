@@ -93,8 +93,19 @@ class FatturaPAParser: NSObject, XMLParserDelegate {
         guard let data = xmlString.data(using: .utf8) else { return model }
         let parser = XMLParser(data: data)
         parser.delegate = self
+        // Disabilitiamo il processing dei namespace: otteniamo il localName diretto
+        parser.shouldProcessNamespaces = false
+        parser.shouldReportNamespacePrefixes = false
         parser.parse()
         return model
+    }
+
+    /// Estrae il nome locale rimuovendo eventuale prefisso namespace (es. "n1:Tag" -> "Tag")
+    private func localName(_ raw: String) -> String {
+        if let idx = raw.lastIndex(of: ":") {
+            return String(raw[raw.index(after: idx)...])
+        }
+        return raw
     }
 
     // MARK: - XMLParserDelegate
@@ -102,17 +113,16 @@ class FatturaPAParser: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didStartElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?,
                 attributes attributeDict: [String: String] = [:]) {
-        currentPath.append(elementName)
+        let name = localName(elementName)
+        currentPath.append(name)
         currentText = ""
 
-        let path = currentPath.joined(separator: "/")
-
-        if elementName == "CedentePrestatore" { inCedente = true }
-        if elementName == "CessionarioCommittente" { inCessionario = true; inCedente = false }
-        if elementName == "DatiGeneraliDocumento" { inDatiGenerali = true }
-        if elementName == "DatiPagamento" { inPagamento = true }
-        if elementName == "DettaglioLinee" { inLinea = true; currentLinea = LineaFattura() }
-        if elementName == "DatiRiepilogo" { inAliquota = true; currentAliquota = AliquotaRiepilogo() }
+        if name == "CedentePrestatore" { inCedente = true }
+        if name == "CessionarioCommittente" { inCessionario = true; inCedente = false }
+        if name == "DatiGeneraliDocumento" { inDatiGenerali = true }
+        if name == "DatiPagamento" { inPagamento = true }
+        if name == "DettaglioLinee" { inLinea = true; currentLinea = LineaFattura() }
+        if name == "DatiRiepilogo" { inAliquota = true; currentAliquota = AliquotaRiepilogo() }
     }
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
@@ -121,6 +131,7 @@ class FatturaPAParser: NSObject, XMLParserDelegate {
 
     func parser(_ parser: XMLParser, didEndElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?) {
+        let elementName = localName(elementName)
         let value = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Cedente / Prestatore
