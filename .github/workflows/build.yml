@@ -1,0 +1,51 @@
+name: Build FatturaPA QLPlugi
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # permette di avviare manualmente dalla UI di GitHub
+
+jobs:
+  build:
+    name: Build su macOS
+    runs-on: macos-latest
+
+    steps:
+
+      # 1. Checkout del codice
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Seleziona Xcode (ultima versione stabile disponibile)
+      - name: Seleziona Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+
+      # 3. Compila il plugin
+      - name: Build
+        run: |
+          xcodebuild \
+            -project FatturaPA-QLPlugin.xcodeproj \
+            -scheme FatturaPA-QLPlugin \
+            -configuration Release \
+            -derivedDataPath build/ \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      # 4. Trova e mostra il percorso del .appex
+      - name: Trova .appex
+        run: |
+          find build/ -name "*.appex" -print
+
+      # 5. Carica il .appex come artifact scaricabile
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FatturaPA-QLPlugin
+          path: build/Build/Products/Release/FatturaPA-QLPlugin.appex
+          retention-days: 30
