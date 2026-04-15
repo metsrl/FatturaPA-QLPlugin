@@ -393,26 +393,30 @@ struct HTMLRenderer {
             <hr class="sep">
             <div class="sezione-titolo">Dati Pagamento</div>
             <div class="pagamento-grid">
-              \(fattura.modalitaPagamento.isEmpty ? "" : """
-              <div class="pagamento-item">
-                <div class="pagamento-label">Modalità</div>
-                <div class="pagamento-val">\(escape(fattura.modalitaPagamento))</div>
-              </div>""")
-              \(fattura.dataScadenzaPagamento.isEmpty ? "" : """
-              <div class="pagamento-item">
-                <div class="pagamento-label">Scadenza</div>
-                <div class="pagamento-val">\(escape(fattura.dataScadenzaPagamento))</div>
-              </div>""")
-              \(fattura.importoPagamento.isEmpty ? "" : """
-              <div class="pagamento-item">
-                <div class="pagamento-label">Importo</div>
-                <div class="pagamento-val">\(escape(fattura.importoPagamento)) \(fattura.divisa)</div>
-              </div>""")
-              \(fattura.ibanAccredito.isEmpty ? "" : """
-              <div class="pagamento-item">
-                <div class="pagamento-label">IBAN</div>
-                <div class="pagamento-val iban">\(escape(fattura.ibanAccredito))</div>
-              </div>""")
+              \(fattura.modalitaPagamento.isEmpty ? "" : (
+                "<div class=\"pagamento-item\">" +
+                "<div class=\"pagamento-label\">Modalità</div>" +
+                "<div class=\"pagamento-val\">\(escape(fattura.modalitaPagamento))</div>" +
+                "</div>"
+              ))
+              \(fattura.dataScadenzaPagamento.isEmpty ? "" : (
+                "<div class=\"pagamento-item\">" +
+                "<div class=\"pagamento-label\">Scadenza</div>" +
+                "<div class=\"pagamento-val\">\(escape(fattura.dataScadenzaPagamento))</div>" +
+                "</div>"
+              ))
+              \(fattura.importoPagamento.isEmpty ? "" : (
+                "<div class=\"pagamento-item\">" +
+                "<div class=\"pagamento-label\">Importo</div>" +
+                "<div class=\"pagamento-val\">\(escape(fattura.importoPagamento)) \(fattura.divisa)</div>" +
+                "</div>"
+              ))
+              \(fattura.ibanAccredito.isEmpty ? "" : (
+                "<div class=\"pagamento-item\">" +
+                "<div class=\"pagamento-label\">IBAN</div>" +
+                "<div class=\"pagamento-val iban\">\(escape(fattura.ibanAccredito))</div>" +
+                "</div>"
+              ))
             </div>
             """ : "")
 
